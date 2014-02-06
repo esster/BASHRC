@@ -1,7 +1,17 @@
 
 # vi for CLI-editing
-#---------------
+# ------------------
 set -o vi
+
+# GLOBAL VARIABLES
+if [[ -e ~/.environment ]]; then
+	env=$(cat "~/.environment")
+	if [[ $env == "koding" ]]; then
+		HOME='/home/racox'
+	elif [[ $env == "mac" ]]; then
+		HOME='/USERS/user'
+	fi
+fi
 
 # ALIAS
 #---------------
@@ -32,8 +42,8 @@ function ff () {
 function c () {
         lss="ls -G -1"
         up="cd .."
-        home="/Users/manfredglaser/"
-        vd="$home"".vim/"
+        # home="$HOME"
+        vd="$HOME""/"".vim/"
         title="echo CONTENT OF: $(pwd)"
         line="echo +++++++++++++++++++++++++++++++++++++++++"
         clear
