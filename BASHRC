@@ -1,0 +1,94 @@
+
+# vi for CLI-editing
+#---------------
+set -o vi
+
+# ALIAS
+#---------------
+alias aa=alias
+
+# source bashrc
+alias sob='source ~/.bashrc'
+
+# jobs
+alias f='fg'
+alias j='jobs'
+
+#---------------
+alias jj=jobs
+alias f1='fg %1'
+alias f2='fg %2'
+alias f3='fg %3'
+#---------------
+# builtin cd $(cdy $1)
+
+function ff () {
+        if [[ ${1:1:1} == "a" ]]; then
+                dir=$1
+                echo ${1}
+        fi
+}
+
+function c () {
+        lss="ls -G -1"
+        up="cd .."
+        home="/Users/manfredglaser/"
+        vd="$home"".vim/"
+        title="echo CONTENT OF: $(pwd)"
+        line="echo +++++++++++++++++++++++++++++++++++++++++"
+        clear
+        #############################
+        if [[ $# -eq 0 ]]; then
+                cd
+                $title; $line; $lss
+        elif [[ $1 == 'u' ]]; then
+                $up
+                $title; $line; $lss
+        elif [[ $1 == 'td' ]]; then
+                echo "#----------- FIND directory -------------"
+                find $(pwd) -type d -print
+        elif [[ $1 == 'tf' ]]; then
+                echo "#----------- FIND files -----------------"
+                find $(pwd) -type f -print
+        # VIM-DIRECTORIES
+        elif [[ $1 == v* ]]; then
+                dmarker=${1:1:2}           # vfd ==> "fd"-part
+                arr=( [1]="a" [11]="after" \
+                      [2]="s" [12]="syntax" \
+                      [3]="fp" [13]="ftplugin" \
+                      [4]="fd" [14]="ftdetect" \
+                      [5]="v" [15]="" )
+                for i in {1..9}; do
+                        if [[ $dmarker == ${arr[$i]} ]]; then
+                                dir=${arr[$i+10]}
+                                break
+                        fi
+                done
+                cd ${vd}$dir
+                $line; $lss
+        else
+                echo 11
+        fi
+        #############################
+        $line
+}
+
+function l () {
+        clear
+        echo "CONTENT OF: "$(pwd)
+        if [[ $# -eq 0 ]]; then
+                ls -1 -G
+        elif [[ $1 == 'a' || $1 == 'l' ]]; then
+                ls -1"$1" -G
+        else
+                echo 11
+        fi
+}
+
+function f () {
+         fg "%"$1
+        # builtin cd $HOME
+}
+
+
+echo ">>>>> LOADED .BASHRC <<<<<<<<<<"
