@@ -1,9 +1,9 @@
 
-# vi for CLI-editing
+# vi for CLI-editing {{{ 
 # ------------------
 set -o vi
-
-# GLOBAL VARIABLES
+# }}} 
+# GLOBAL VARIABLES {{{ 
 if [[ -e ~/.environment ]]; then
 	env=$(cat "~/.environment")
 	if [[ $env == "koding" ]]; then
@@ -12,8 +12,8 @@ if [[ -e ~/.environment ]]; then
 		HOME='/USERS/user'
 	fi
 fi
-
-# ALIAS
+# }}} 
+# ALIAS {{{ 
 #---------------
 alias aa=alias
 
@@ -31,14 +31,17 @@ alias f2='fg %2'
 alias f3='fg %3'
 #---------------
 # builtin cd $(cdy $1)
-
+# }}}
+# FUNCTIONS {{{ 
+# ff () {{{ 
 function ff () {
         if [[ ${1:1:1} == "a" ]]; then
                 dir=$1
                 echo ${1}
         fi
 }
-
+# }}} 
+# c () {{{ 
 function c () {
         lss="ls -G -1"
         up="cd .."
@@ -82,7 +85,8 @@ function c () {
         #############################
         $line
 }
-
+# }}} 
+# l () {{{ 
 function l () {
         clear
         echo "CONTENT OF: "$(pwd)
@@ -94,11 +98,12 @@ function l () {
                 echo 11
         fi
 }
-
+# }}} 
+# f () {{{ 
 function f () {
          fg "%"$1
-        # builtin cd $HOME
 }
-
+# }}} 
+# }}}
 
 echo ">>>>> LOADED .BASHRC <<<<<<<<<<"
