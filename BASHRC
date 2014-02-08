@@ -183,4 +183,4 @@ function f () {
 # }}} 
 # }}}
 
-echo ">>>>> LOADED .BASHRC <<<<<<<<<<"
+echo ">> LOADED .BASHRC env:$MYENV <<"
