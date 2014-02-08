@@ -4,14 +4,60 @@
 set -o vi
 # }}} 
 # GLOBAL VARIABLES {{{ 
+ARG1=""
+SEPLINE='echo "+++++++++++++++++++++++++++++"'
+# MYENV {{{
 if [[ -e ~/.environment ]]; then
-	env=$(cat "~/.environment")
-	if [[ $env == "koding" ]]; then
-		HOME='/home/racox'
-	elif [[ $env == "mac" ]]; then
-		HOME='/USERS/user'
-	fi
+	    MYENV=$(cat ~/.environment)
 fi
+# }}}
+# LSCOLOR {{{
+case $MYENV in
+    "mac") LSCOLOR="-G";;
+    "koding") LSCOLOR="--color=auto";;
+esac
+
+DEFAULTLS="ls $LSCOLOR -1F"
+# }}}
+# ARRAYS, vimdirs, homedirs {{{
+VIMDIRS[1]="a"
+VIMDIRS[11]="after"
+VIMDIRS[2]="s"
+VIMDIRS[12]="syntax"
+VIMDIRS[3]="fp"
+VIMDIRS[13]="ftplugin"
+VIMDIRS[4]="fd"
+VIMDIRS[14]="ftdetect"
+VIMDIRS[5]="v"
+VIMDIRS[15]=""
+VIMDIRS[99]="$HOME/.vim"
+
+case $MYENV in
+    "mac")
+HOMEDIRS[1]="de"
+HOMEDIRS[11]="Desktop"
+HOMEDIRS[2]="do"
+HOMEDIRS[12]="Documents"
+HOMEDIRS[3]="dl"
+HOMEDIRS[13]="Downloads"
+HOMEDIRS[4]="a"
+HOMEDIRS[14]="appengine"
+HOMEDIRS[5]="e"
+HOMEDIRS[15]="evernote"
+;;
+"koding")
+HOMEDIRS[1]="w"
+HOMEDIRS[11]="Web"
+HOMEDIRS[2]="p"
+HOMEDIRS[12]="py"
+HOMEDIRS[3]="sh"
+HOMEDIRS[13]="BASHRC"
+HOMEDIRS[4]="bak"
+HOMEDIRS[14]="Backup"
+;;
+esac
+# }}}
+
 # }}} 
 # ALIAS {{{ 
 #---------------
@@ -29,79 +75,110 @@ alias jj=jobs
 alias f1='fg %1'
 alias f2='fg %2'
 alias f3='fg %3'
-#---------------
+#--------------i-
 # builtin cd $(cdy $1)
 # }}}
 # FUNCTIONS {{{ 
-# ff () {{{ 
-function ff () {
-        if [[ ${1:1:1} == "a" ]]; then
-                dir=$1
-                echo ${1}
-        fi
+# unset functions {{{
+# unload functions, to update functions
+unset -f c f l
+unset -f getdir
+unset -f ftest
+# }}}
+# getdir () {{{ 
+function getdir () {
+        arg="${ARG1:0:3}"              # first, three characters
+        if [[ "${arg:0:1}" == v ]]; then
+                tchar="${arg:1:2}"     # second, third characters
+                dir=${VIMDIRS[99]}     # .vim-path
+                arr="VIMDIRS"	       #
+        else 
+                tchar=$arg
+                dir=$HOME
+                arr="HOMEDIRS"
+        fi  
+        for i in {1..9}; do
+                eval 'char=${'$arr'[$i]}' 
+                if [[ $tchar == $char ]]; then
+                        eval 'subdir=${'$arr'[$i+10]}'
+                        echo "${dir}""/""${subdir}"
+                        break
+                fi  
+        done
 }
 # }}} 
 # c () {{{ 
 function c () {
-        lss="ls -G -1"
         up="cd .."
-        # home="$HOME"
-        vd="$HOME""/"".vim/"
-        title="echo CONTENT OF: $(pwd)"
-        line="echo +++++++++++++++++++++++++++++++++++++++++"
+        title="echo CONTENT OF: <$FUNCNAME>"
         clear
+	$SEPLINE
         #############################
         if [[ $# -eq 0 ]]; then
                 cd
-                $title; $line; $lss
+                $title; $SEPLINE; $DEFAULTLS
         elif [[ $1 == 'u' ]]; then
                 $up
-                $title; $line; $lss
+                $title; $SEPLINE; $DEFAULTLS
+        elif [[ $1 == 'i' ]]; then
+                for arr in "VIMDIRS" "HOMEDIRS"; do
+                	for ii in {1..9}; do
+				eval 'key=${'$arr'[$ii]}'
+				eval 'val=${'$arr'[$ii+10]}'
+				if [[ ! -z $key ]]; then
+					# echo "${key}"" ==> ""${val}"
+					printf '%10s ==> %s\n' $key $val
+				fi
+                	done
+		done
         elif [[ $1 == 'td' ]]; then
                 echo "#----------- FIND directory -------------"
                 find $(pwd) -type d -print
         elif [[ $1 == 'tf' ]]; then
                 echo "#----------- FIND files -----------------"
                 find $(pwd) -type f -print
-        # VIM-DIRECTORIES
-        elif [[ $1 == v* ]]; then
-                dmarker=${1:1:2}           # vfd ==> "fd"-part
-                arr=( [1]="a" [11]="after" \
-                      [2]="s" [12]="syntax" \
-                      [3]="fp" [13]="ftplugin" \
-                      [4]="fd" [14]="ftdetect" \
-                      [5]="v" [15]="" )
-                for i in {1..9}; do
-                        if [[ $dmarker == ${arr[$i]} ]]; then
-                                dir=${arr[$i+10]}
-                                break
-                        fi
-                done
-                cd ${vd}$dir
-                $line; $lss
         else
-                echo 11
+                ARG1="$1"
+                dir=$(getdir)
+                cd ${dir}
+                $SEPLINE; $DEFAULTLS
         fi
         #############################
-        $line
+        $SEPLINE
 }
 # }}} 
 # l () {{{ 
 function l () {
+        # in "koding" remove existing ls-ALIASES
         clear
-        echo "CONTENT OF: "$(pwd)
+        $SEPLINE
+        #     -rw-r--r-- 1
+        echo "           LiST FILES"
+        $SEPLINE
         if [[ $# -eq 0 ]]; then
-                ls -1 -G
-        elif [[ $1 == 'a' || $1 == 'l' ]]; then
-                ls -1"$1" -G
-        else
-                echo 11
+                $DEFAULTLS
+        elif [[ "$1" == a || $1 == l ]]; then
+                $DEFAULTLS"$1"
         fi
+        $SEPLINE
+}
+# }}} 
+# ftest () {{{ 
+function ftest () {
+        arr="VIMDIRS"	       # .vim-path
+	i=99
+	eval 'dir=${'$arr'[$i]}'
+	echo "${dir}"
+	echo "${FUNCNAME}"
 }
 # }}} 
 # f () {{{ 
 function f () {
-         fg "%"$1
+        if [[ $# -eq 0 ]]; then
+            fg
+        else
+            fg "%"$1
+        fi
 }
 # }}} 
 # }}}
