@@ -44,6 +44,8 @@ HOMEDIRS[4]="a"
 HOMEDIRS[14]="appengine"
 HOMEDIRS[5]="e"
 HOMEDIRS[15]="evernote"
+HOMEDIRS[6]="sh"
+HOMEDIRS[16]="BASHRC"
 ;;
 "koding")
 HOMEDIRS[1]="w"
